@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  database:
+    hostname: "file_hosting_db_host"
+    container_name: "file_hosting_db"
+    image: postgres:14-alpine
+
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=file_hosting
+  api:
+    container_name: file_hosting_api
+
+    ports:
+      - "65432:65432"
+    build:
+      context: ./file_hosting
+      dockerfile: Dockerfile
+    environment:
+      - SECRET_KEY=YourSecretKey
+      - DB_URL=postgresql://postgres:postgres@file_hosting_db_host/file_hosting
+    platform: linux/amd64
+    restart: always
+
+    depends_on:
+      - database
