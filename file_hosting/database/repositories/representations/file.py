@@ -8,5 +8,7 @@ class FileRepr:
     url: str
     time_added: datetime
     directory_id: int
+    type: str
+    name: str | None
 
     id: UUID | None = None

@@ -25,13 +25,17 @@ class FileRepository(BaseRepository[FileModel, FileRepr]):
             id=model_object.id,
             url=model_object.url,
             time_added=model_object.time_added,
-            directory_id=model_object.directory_id
+            directory_id=model_object.directory_id,
+            type=model_object.type,
+            name=model_object.name
         )
 
     def _convert_to_model(self, repr_object: FileRepr) -> FileModel:
         return self._model(
             url=repr_object.url,
-            directory_id=repr_object.directory_id
+            directory_id=repr_object.directory_id,
+            name=repr_object.name,
+            type=repr_object.type
         )
 
     def _select_files(self, user_id: int, directory_id: int) -> Select:

@@ -35,13 +35,13 @@ class Directory(HostingBase):
 
 
 class File(HostingBase):
-    # TODO. Add more metadata
-
     __tablename__ = 'files'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
 
     url = Column(String)
+    name = Column(String)
+    type = Column(String, nullable=False)
     time_added = Column(DateTime, server_default=func.now())
 
     directory_id = Column(
