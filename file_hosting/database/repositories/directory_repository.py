@@ -32,10 +32,18 @@ class DirectoryRepository(BaseRepository[Directory, DirectoryRepr]):
     def _select_directories(self, user_id: int) -> Select:
         return select(self._model).filter_by(user_id=user_id)
 
-    def get_by_id(self, model, user_id: int, id_: int) -> DirectoryRepr | None:
+    def get_by_id(self, user_id: int, id_: int) -> DirectoryRepr | None:
         with self._transaction() as session:
             directory = session.scalar(
                 self._select_directories(user_id).filter_by(id=id_)
+            )
+        if directory:
+            return self._convert_to_repr(directory)
+
+    def get_by_name(self, user_id: int, name: str) -> DirectoryRepr | None:
+        with self._transaction() as session:
+            directory = session.scalar(
+                self._select_directories(user_id).filter_by(name=name)
             )
         if directory:
             return self._convert_to_repr(directory)
