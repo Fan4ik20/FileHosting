@@ -14,12 +14,11 @@ from .representations.user import UserRepr
 class UserRepository(BaseRepository[UserModel, UserRepr]):
     def __init__(
             self, db: sessionmaker, model: Type[UserModel] = UserModel,
-            repr_model: Type[UserRepr] = UserRepr
     ) -> None:
-        super().__init__(db, model, repr_model)
+        super().__init__(db, model)
 
     def _convert_to_repr(self, model_object: UserModel) -> UserRepr:
-        return self._repr(
+        return UserRepr(
             id=model_object.id,
             username=model_object.username,
             email=model_object.email,

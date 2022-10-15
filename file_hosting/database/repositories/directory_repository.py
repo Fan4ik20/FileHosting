@@ -13,12 +13,11 @@ from .representations.directory import DirectoryRepr
 class DirectoryRepository(BaseRepository[Directory, DirectoryRepr]):
     def __init__(
             self, db: sessionmaker, model: Type[Directory] = Directory,
-            repr_model: Type[DirectoryRepr] = DirectoryRepr
     ) -> None:
-        super().__init__(db, model, repr_model)
+        super().__init__(db, model)
 
     def _convert_to_repr(self, model_object: Directory) -> DirectoryRepr:
-        return self._repr(
+        return DirectoryRepr(
             id=model_object.id,
             user_id=model_object.user_id,
             name=model_object.name

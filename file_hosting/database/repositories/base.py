@@ -14,11 +14,10 @@ identifier: TypeAlias = int | str
 
 class BaseRepository(Generic[Model, Repr]):
     def __init__(
-            self, db: sessionmaker, model: Type[Model], repr_model: Type[Repr]
+            self, db: sessionmaker, model: Type[Model]
     ) -> None:
         self._db = db
         self._model = model
-        self._repr = repr_model
 
     @contextmanager
     def _transaction(self) -> Session:

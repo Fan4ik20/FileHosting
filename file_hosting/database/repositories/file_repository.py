@@ -14,15 +14,14 @@ from .representations.file import FileRepr
 class FileRepository(BaseRepository[FileModel, FileRepr]):
     def __init__(
             self, db: sessionmaker, model: Type[FileModel] = FileModel,
-            repr_model: Type[FileRepr] = FileRepr,
             directory_model: Type[DirectoryModel] = DirectoryModel
     ) -> None:
         self._directory_model = directory_model
 
-        super().__init__(db, model, repr_model)
+        super().__init__(db, model)
 
     def _convert_to_repr(self, model_object: FileModel) -> FileRepr:
-        return self._repr(
+        return FileRepr(
             id=model_object.id,
             url=model_object.url,
             time_added=model_object.time_added,
