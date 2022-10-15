@@ -7,7 +7,7 @@ Repr = TypeVar('Repr')
 
 class ServiceBase(Generic[Repository, Repr]):
     def __init__(self, repository: Repository) -> None:
-        self.repository = repository
+        self._repository = repository
 
     def get(self, *args) -> Repr:
         raise NotImplementedError
