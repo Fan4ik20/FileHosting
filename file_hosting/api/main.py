@@ -27,6 +27,7 @@ from services.file_service import FileService
 
 from .routers import hosting_router
 from .exceptions import handlers
+from .exceptions import base_exc
 
 
 def _include_routers(app: FastAPI) -> None:
@@ -36,6 +37,12 @@ def _include_routers(app: FastAPI) -> None:
 def _include_handlers(app: FastAPI) -> None:
     app.add_exception_handler(
         handlers.AuthJWTException, handlers.authjwt_exception_handler
+    )
+    app.add_exception_handler(
+        base_exc.ObjectNotExist, handlers.object_not_exist_handler
+    )
+    app.add_exception_handler(
+        base_exc.ObjectAlreadyExist, handlers.object_already_exist_handler
     )
 
 
