@@ -17,7 +17,7 @@ from api.exceptions import exc as http_exc
 from .schemas import directory as directory_sch
 
 
-router = APIRouter(prefix='/directories', tags=['directories'])
+router = APIRouter(prefix='/directories', tags=['Directories'])
 
 
 def _map_schema_to_repr(
