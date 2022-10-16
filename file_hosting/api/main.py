@@ -44,6 +44,9 @@ def _include_handlers(app: FastAPI) -> None:
     app.add_exception_handler(
         base_exc.ObjectAlreadyExist, handlers.object_already_exist_handler
     )
+    app.add_exception_handler(
+        base_exc.InvalidData, handlers.invalid_data_handler
+    )
 
 
 def _include_services(app: FastAPI, session_maker: sessionmaker) -> None:

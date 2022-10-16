@@ -32,3 +32,13 @@ def object_already_exist_handler(_: Request, exc: base_exc.ObjectAlreadyExist):
             'place': f'{exc.place}'
         }
     )
+
+
+def invalid_data_handler(_: Request, exc: base_exc.InvalidData):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            'message': f'You passed wrong {exc.model} {exc.attr}',
+            'place': f'{exc.place}'
+        }
+    )
