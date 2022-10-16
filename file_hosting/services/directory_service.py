@@ -36,6 +36,8 @@ class DirectoryService(ServiceBase[DirectoryRepository, DirectoryRepr]):
         return directory
 
     def get(self, user_id: int, directory_id: int) -> DirectoryRepr:
+        """Raises: UserNotFound, DirectoryNotFound"""
+
         self._get_user_or_raise_exc(user_id)
 
         return self._get_directory_or_raise_exc(user_id, directory_id)
@@ -43,11 +45,15 @@ class DirectoryService(ServiceBase[DirectoryRepository, DirectoryRepr]):
     def get_all(
             self, user_id: int, offset: int = 0, limit: int = 100
     ) -> Iterable[DirectoryRepr]:
+        """Raises: UserNotFound"""
+
         self._get_user_or_raise_exc(user_id)
 
         return self._repository.get_all(user_id, offset, limit)
 
     def create(self, directory_repr: DirectoryRepr) -> DirectoryRepr:
+        """Raises: UserNotFound, DirectoryWithNameAlreadyExist"""
+
         self._get_user_or_raise_exc(directory_repr.user_id)
 
         if self._repository.get_by_name(
@@ -58,6 +64,8 @@ class DirectoryService(ServiceBase[DirectoryRepository, DirectoryRepr]):
         return self._repository.create(directory_repr)
 
     def delete(self, user_id: int, directory_id: int) -> None:
+        """Raises: UserNotFound, DirectoryNotFound"""
+
         self._get_user_or_raise_exc(user_id)
         directory = self._get_directory_or_raise_exc(user_id, directory_id)
 

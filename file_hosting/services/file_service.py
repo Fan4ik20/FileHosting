@@ -60,6 +60,8 @@ class FileService(ServiceBase[FileRepository, FileRepr]):
     def get(
             self, user_id: int, directory_id: int, file_id: UUID
     ) -> FileRepr:
+        """Raises: UserNotFound, DirectoryNotFound, FileNotFound"""
+
         self._raise_exc_if_user_or_directory_is_none(user_id, directory_id)
 
         return self._get_file_or_raise_exc(
@@ -70,11 +72,15 @@ class FileService(ServiceBase[FileRepository, FileRepr]):
             self, user_id: int, directory_id: int,
             offset: int = 0, limit: int = 100
     ) -> Iterable[FileRepr]:
+        """Raises: UserNotFound, DirectoryNotFound"""
+
         self._raise_exc_if_user_or_directory_is_none(user_id, directory_id)
 
         return self._repository.get_all(user_id, directory_id, offset, limit)
 
     def create(self, user_id: int, file_repr: FileRepr) -> FileRepr:
+        """Raises: UserNotFound, DirectoryNotFound"""
+
         self._raise_exc_if_user_or_directory_is_none(
             user_id, file_repr.directory_id
         )
@@ -84,6 +90,8 @@ class FileService(ServiceBase[FileRepository, FileRepr]):
     def delete(
             self, user_id: int, directory_id: int, file_id: UUID
     ) -> None:
+        """Raises: UserNotFound, DirectoryNotFound, FileNotFound"""
+
         self._raise_exc_if_user_or_directory_is_none(user_id, directory_id)
 
         self._repository.delete(file_id)
