@@ -31,7 +31,7 @@ from .exceptions import base_exc
 
 
 def _include_routers(app: FastAPI) -> None:
-    app.include_router(hosting_router.router, prefix='api/v1')
+    app.include_router(hosting_router.router, prefix='/api/v1')
 
 
 def _include_handlers(app: FastAPI) -> None:
@@ -95,13 +95,14 @@ def create_app() -> FastAPI:
     _include_routers(app)
     _include_handlers(app)
     _include_cors(app, origins)
+    _include_auth(app)
 
     return app
 
 
 @AuthJWT.load_config
 def get_config():
-    return JWTSettings()
+    return JWTSettings(_env_file='.env')
 
 
 api = create_app()
