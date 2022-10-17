@@ -1,25 +1,15 @@
-from typing import Type
 from uuid import UUID
 
 from sqlalchemy import select, delete
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import Select
 
-from database.models import File as FileModel, Directory as DirectoryModel
+from database.models import File as FileModel
 
-from .base import BaseRepository
+from .abstract.file_base import AFileRepository
 from .representations.file import FileRepr
 
 
-class FileRepository(BaseRepository[FileModel, FileRepr]):
-    def __init__(
-            self, db: sessionmaker, model: Type[FileModel] = FileModel,
-            directory_model: Type[DirectoryModel] = DirectoryModel
-    ) -> None:
-        self._directory_model = directory_model
-
-        super().__init__(db, model)
-
+class FileRepository(AFileRepository):
     def _convert_to_repr(self, model_object: FileModel) -> FileRepr:
         return FileRepr(
             id=model_object.id,

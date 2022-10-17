@@ -2,7 +2,6 @@ from typing import Generic, TypeVar, Type, TypeAlias
 
 from contextlib import contextmanager
 
-from sqlalchemy import delete, select
 from sqlalchemy.orm import sessionmaker, Session
 
 

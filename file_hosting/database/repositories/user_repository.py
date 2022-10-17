@@ -1,22 +1,14 @@
-from typing import Type
-
 from sqlalchemy import delete, select
-from sqlalchemy.orm import sessionmaker
 
 from database.models import User as UserModel
 
 from common.utils.passwords import get_password_hash
 
-from .base import BaseRepository
+from .abstract.user_base import AUserRepository
 from .representations.user import UserRepr
 
 
-class UserRepository(BaseRepository[UserModel, UserRepr]):
-    def __init__(
-            self, db: sessionmaker, model: Type[UserModel] = UserModel,
-    ) -> None:
-        super().__init__(db, model)
-
+class UserRepository(AUserRepository):
     def _convert_to_repr(self, model_object: UserModel) -> UserRepr:
         return UserRepr(
             id=model_object.id,

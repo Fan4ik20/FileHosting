@@ -6,11 +6,11 @@ from sqlalchemy.orm import sessionmaker
 
 from database.models import Directory
 
-from .base import BaseRepository
+from .abstract.directory_base import ADirectoryRepository
 from .representations.directory import DirectoryRepr
 
 
-class DirectoryRepository(BaseRepository[Directory, DirectoryRepr]):
+class DirectoryRepository(ADirectoryRepository):
     def __init__(
             self, db: sessionmaker, model: Type[Directory] = Directory,
     ) -> None:
