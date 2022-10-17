@@ -1,6 +1,8 @@
+import os
 from typing import Type
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi_jwt_auth import AuthJWT
@@ -88,6 +90,12 @@ def _include_cors(app: FastAPI, origins: list[str]) -> None:
     )
 
 
+def _include_static(app: FastAPI) -> None:
+    os.makedirs('./media/', exist_ok=True)
+
+    app.mount('/media/', StaticFiles(directory='media'), name='media')
+
+
 def create_app() -> FastAPI:
     app = FastAPI(docs_url='/api/v1/docs/', redoc_url=None)
     db_config = DatabaseSettings(_env_file='.env')
@@ -99,6 +107,7 @@ def create_app() -> FastAPI:
     _include_handlers(app)
     _include_cors(app, origins)
     _include_auth(app)
+    _include_static(app)
 
     return app
 
