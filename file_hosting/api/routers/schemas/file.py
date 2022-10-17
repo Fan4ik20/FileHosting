@@ -16,9 +16,10 @@ class FilePost(FileBase):
     pass
 
 
-class FileGet(BaseModel):
+class FileGet(FileBase):
     id: UUID
     time_added: datetime
+    directory_id: int
 
     class Config:
         orm_mode = True
