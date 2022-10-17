@@ -1,22 +1,13 @@
 from typing import Iterable
 
-from database.repositories.directory_repository import \
-    DirectoryRepository, DirectoryRepr
-from database.repositories.user_repository import UserRepository, UserRepr
+from database.repositories.directory_repository import DirectoryRepr
+from database.repositories.user_repository import UserRepr
 
-from .base import ServiceBase
+from services.abstract.directory_base import ADirectoryService
 from .exceptions import user_exc, directory_exc
 
 
-class DirectoryService(ServiceBase[DirectoryRepository, DirectoryRepr]):
-    def __init__(
-            self, repository: DirectoryRepository,
-            user_repository: UserRepository
-    ) -> None:
-        self._user_repository = user_repository
-
-        super().__init__(repository)
-
+class DirectoryService(ADirectoryService):
     def _get_user_or_raise_exc(self, user_id: int) -> UserRepr:
         user = self._user_repository.get_by_id(user_id)
 

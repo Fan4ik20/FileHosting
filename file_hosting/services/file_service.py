@@ -1,26 +1,15 @@
 from typing import Iterable
 from uuid import UUID
 
-from database.repositories.directory_repository import \
-    DirectoryRepository, DirectoryRepr
-from database.repositories.user_repository import UserRepository, UserRepr
-from database.repositories.file_repository import FileRepository, FileRepr
+from database.repositories.directory_repository import DirectoryRepr
+from database.repositories.user_repository import UserRepr
+from database.repositories.file_repository import FileRepr
 
-from .base import ServiceBase
+from .abstract.file_base import AFileService
 from .exceptions import user_exc, directory_exc, file_exc
 
 
-class FileService(ServiceBase[FileRepository, FileRepr]):
-    def __init__(
-            self, repository: FileRepository,
-            user_repository: UserRepository,
-            directory_repository: DirectoryRepository
-    ) -> None:
-        self._user_repository = user_repository
-        self._directory_repository = directory_repository
-
-        super().__init__(repository)
-
+class FileService(AFileService):
     def _get_user_or_raise_exc(self, user_id: int) -> UserRepr:
         user = self._user_repository.get_by_id(user_id)
 
