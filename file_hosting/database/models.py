@@ -39,8 +39,8 @@ class File(HostingBase):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
 
-    url = Column(String)
-    name = Column(String)
+    url = Column(String, nullable=False)
+    name = Column(String, nullable=False)
     type = Column(String, nullable=False)
     time_added = Column(DateTime, server_default=func.now())
 

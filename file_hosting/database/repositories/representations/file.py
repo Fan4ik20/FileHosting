@@ -6,9 +6,9 @@ from uuid import UUID
 @dataclass
 class FileRepr:
     url: str
-    time_added: datetime
     directory_id: int
     type: str
     name: str | None
 
+    time_added: datetime | None = None
     id: UUID | None = None
