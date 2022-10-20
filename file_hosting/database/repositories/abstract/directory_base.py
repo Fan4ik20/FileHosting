@@ -31,6 +31,12 @@ class ADirectoryRepository(ABC, BaseRepository[DirectoryModel, DirectoryRepr]):
         pass
 
     @abstractmethod
+    def get_by_id_with_inner(
+            self, user_id: int, id_: int
+    ) -> DirectoryRepr | None:
+        pass
+
+    @abstractmethod
     def get_by_name(self, user_id: int, name: str) -> DirectoryRepr | None:
         pass
 

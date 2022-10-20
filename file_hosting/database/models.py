@@ -4,7 +4,7 @@ from sqlalchemy import (
     Column, Integer, String, ForeignKey, DateTime, func, UniqueConstraint
 )
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import declarative_base, relationship, backref
 
 HostingBase = declarative_base()
 
@@ -30,6 +30,13 @@ class Directory(HostingBase):
         Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False
     )
     user = relationship('User', backref='directories')
+
+    directory_id = Column(
+        Integer, ForeignKey('directories.id', ondelete='CASCADE')
+    )
+    inner_dirs = relationship(
+        'Directory', backref=backref('external_dir', remote_side=[id])
+    )
 
     __table_args__ = (UniqueConstraint('name', 'user_id'),)
 
