@@ -17,24 +17,32 @@ class DirectoryService(ADirectoryService):
         return user
 
     def _get_directory_or_raise_exc(
-            self, user_id: int, directory_id: int
+            self, user_id: int, directory_id: int, with_inner: bool = False
     ) -> DirectoryRepr:
-        directory = self._repository.get_by_id(user_id, directory_id)
+        directory = (
+            self._repository.get_by_id(user_id, directory_id) if not with_inner
+            else self._repository.get_by_id_with_inner(user_id, directory_id)
+        )
 
         if directory is None:
             raise directory_exc.DirectoryNotFound
 
         return directory
 
-    def get(self, user_id: int, directory_id: int) -> DirectoryRepr:
+    def get(
+            self, user_id: int, directory_id: int,
+            with_inner: bool = False
+    ) -> DirectoryRepr:
         """Raises: UserNotFound, DirectoryNotFound"""
 
         self._get_user_or_raise_exc(user_id)
 
-        return self._get_directory_or_raise_exc(user_id, directory_id)
+        return self._get_directory_or_raise_exc(
+            user_id, directory_id, with_inner
+        )
 
     def get_all(
-            self, user_id: int, offset: int = 0, limit: int = 100
+            self, user_id: int, offset: int = 0, limit: int = 100,
     ) -> Iterable[DirectoryRepr]:
         """Raises: UserNotFound"""
 
