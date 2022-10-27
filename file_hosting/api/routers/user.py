@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import Response
 
-from services.abstract.user_base import AUserService, UserRepr
-from services.exceptions import base as service_exc
+from database.repositories.representations import UserRepr
+
+from services import IUserService
+from services import service_exc
 
 from api.dependencies.stubs.services import UserServiceS
 from api.dependencies.stubs.auth import ActiveUserS
@@ -25,7 +27,7 @@ def get_active_user(user: UserRepr = Depends(ActiveUserS)):
 )
 def delete_active_user(
         user: UserRepr = Depends(ActiveUserS),
-        user_service: AUserService = Depends(UserServiceS)
+        user_service: IUserService = Depends(UserServiceS)
 ):
     # FIXME.
 

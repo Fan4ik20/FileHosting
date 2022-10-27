@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, Depends, UploadFile
 
-from database.repositories.representations.user import UserRepr
+from database.repositories.representations import UserRepr
 
 from api.dependencies.stubs.auth import ActiveUserS
 

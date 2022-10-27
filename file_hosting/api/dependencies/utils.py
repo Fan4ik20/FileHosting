@@ -1,8 +1,10 @@
 from fastapi import Depends
 from fastapi_jwt_auth import AuthJWT
 
-from services.user_service import UserService, UserRepr
-from services.exceptions import user_exc
+from database.repositories.representations import UserRepr
+
+from services import UserService
+from services import exceptions as service_exc
 
 from .stubs.services import UserServiceS
 
@@ -26,7 +28,7 @@ def get_current_user(
 
     try:
         user = user_service.get(user_id)
-    except user_exc.UserNotFound:
+    except service_exc.UserNotFound:
         raise ValueError
 
     return user

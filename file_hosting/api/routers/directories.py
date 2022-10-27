@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import Response
 
-from database.repositories.representations.directory import DirectoryRepr
-from database.repositories.representations.user import UserRepr
+from database.repositories.representations import DirectoryRepr, UserRepr
 
-from services.directory_service import DirectoryService
-from services.exceptions import base as service_exc
+
+from services import IDirectoryService
+from services import service_exc
 
 from api.dependencies.stubs.services import DirectoryServiceS
 from api.dependencies.stubs.auth import ActiveUserS
@@ -25,14 +25,15 @@ def _map_schema_to_repr(
 ) -> DirectoryRepr:
     return DirectoryRepr(
         name=directory.name,
-        user_id=user_id
+        user_id=user_id,
+        directory_id=directory.directory_id
     )
 
 
 @router.get('/', response_model=list[directory_sch.DirectoryGet])
 def get_directories(
         active_user: UserRepr = Depends(ActiveUserS),
-        directory_service: DirectoryService = Depends(DirectoryServiceS),
+        directory_service: IDirectoryService = Depends(DirectoryServiceS),
         pagination: PaginationParams = Depends()
 ):
     try:
@@ -50,7 +51,7 @@ def get_directories(
 def create_directory(
         directory: directory_sch.DirectoryCreate,
         active_user: UserRepr = Depends(ActiveUserS),
-        directory_service: DirectoryService = Depends(DirectoryServiceS)
+        directory_service: IDirectoryService = Depends(DirectoryServiceS)
 ):
     directory_repr = _map_schema_to_repr(directory, active_user.id)
 
@@ -68,10 +69,15 @@ def create_directory(
 def get_directory(
         directory_id: int,
         active_user: UserRepr = Depends(ActiveUserS),
-        directory_service: DirectoryService = Depends(DirectoryServiceS)
+        directory_service: IDirectoryService = Depends(DirectoryServiceS)
 ):
     try:
-        return directory_service.get(active_user.id, directory_id)
+        directory = directory_service.get(
+            active_user.id, directory_id, with_inner=True
+        )
+
+        print(directory.inner_dirs)
+        return directory
     except service_exc.NotFoundError as err:
         raise http_exc.ObjectNotExistInPath(err.model)
 
@@ -83,7 +89,7 @@ def get_directory(
 def delete_directory(
         directory_id: int,
         active_user: UserRepr = Depends(ActiveUserS),
-        directory_service: DirectoryService = Depends(DirectoryServiceS)
+        directory_service: IDirectoryService = Depends(DirectoryServiceS)
 ):
     try:
         directory_service.delete(active_user.id, directory_id)

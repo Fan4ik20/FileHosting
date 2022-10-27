@@ -3,15 +3,15 @@ from fastapi_jwt_auth import AuthJWT
 
 from common.utils.passwords import verify_password
 
-from database.repositories.representations.user import UserRepr
+from database.repositories.representations import UserRepr
 
-from services.user_service import UserService
-from services.exceptions import base as service_exc
+from services import UserService
+from services import service_exc
 
 from api.dependencies.stubs.services import UserServiceS
 from api.exceptions import exc as http_exc
 
-from .schemas import user as user_sch
+from .schemas import user_sch
 
 
 router = APIRouter(tags=['Authentication'])

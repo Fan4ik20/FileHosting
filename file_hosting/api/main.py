@@ -19,13 +19,11 @@ from .dependencies.stubs import services as services_s
 
 from .dependencies import utils as dependency_utils
 
-from database.repositories.user_repository import UserRepository
-from database.repositories.directory_repository import DirectoryRepository
-from database.repositories.file_repository import FileRepository
+from database.repositories import (
+    UserRepository, DirectoryRepository, FileRepository
+)
 
-from services.user_service import UserService
-from services.directory_service import DirectoryService
-from services.file_service import FileService
+from services import UserService, DirectoryService, FileService
 
 from .routers import hosting_router
 from .exceptions import handlers

@@ -3,9 +3,9 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import Response
 
-from database.repositories.representations.user import UserRepr
+from database.repositories.representations import UserRepr, FileRepr
 
-from services.abstract.file_base import AFileService, FileRepr
+from services import IFileService
 from services.exceptions import base as service_exc
 
 from api.dependencies.stubs.services import FileServiceS
@@ -34,7 +34,7 @@ router = APIRouter(prefix='/directories/{directory_id}/files', tags=['Files'])
 def get_files(
         directory_id: int, pagination: PaginationParams = Depends(),
         user: UserRepr = Depends(ActiveUserS),
-        file_service: AFileService = Depends(FileServiceS)
+        file_service: IFileService = Depends(FileServiceS)
 ):
     try:
         return file_service.get_all(
@@ -48,7 +48,7 @@ def get_files(
 def create_file(
         directory_id: int, file_sch: FilePost,
         user: UserRepr = Depends(ActiveUserS),
-        file_service: AFileService = Depends(FileServiceS)
+        file_service: IFileService = Depends(FileServiceS)
 ):
     file_repr = _map_schema_to_repr(directory_id, file_sch)
 
@@ -62,7 +62,7 @@ def create_file(
 def get_file(
         directory_id: int, file_id: UUID,
         user: UserRepr = Depends(ActiveUserS),
-        file_service: AFileService = Depends(FileServiceS)
+        file_service: IFileService = Depends(FileServiceS)
 ):
     try:
         return file_service.get(user.id, directory_id, file_id)
@@ -77,7 +77,7 @@ def get_file(
 def delete_file(
         directory_id: int, file_id: UUID,
         user: UserRepr = Depends(ActiveUserS),
-        file_service: AFileService = Depends(FileServiceS)
+        file_service: IFileService = Depends(FileServiceS)
 ):
     try:
         return file_service.delete(user.id, directory_id, file_id)
