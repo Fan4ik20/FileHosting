@@ -20,7 +20,9 @@ class ADirectoryService(ABC, ServiceBase[IDirectoryRepository, DirectoryRepr]):
         super().__init__(repository)
 
     @abstractmethod
-    def get(self, user_id: int, directory_id: int) -> DirectoryRepr:
+    def get(
+            self, user_id: int, directory_id: int, with_inner: bool = False
+    ) -> DirectoryRepr:
         pass
 
     @abstractmethod

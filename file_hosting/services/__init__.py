@@ -6,10 +6,12 @@ from .file_service import FileService
 from .directory_service import DirectoryService
 from .user_service import UserService
 
+from . import exceptions as service_exc
+
 
 __all__ = [
     'IUserService', 'UserService',
     'IDirectoryService', 'DirectoryService',
-    'IFileService', 'FileService'
+    'IFileService', 'FileService',
+    'service_exc'
 ]
-
