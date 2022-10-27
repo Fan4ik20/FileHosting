@@ -1,35 +1,29 @@
 from uuid import UUID
+from typing import Type
 
 from sqlalchemy import select, delete
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import Select
 
-from database.models import File as FileModel
+from database.models import File as FileModel, Directory as DirectoryModel
 
 from .abstract.file_base import AFileRepository
 from .representations import FileRepr
+from .converters import FileConverter
 
 
 __all__ = ['FileRepository']
 
 
 class FileRepository(AFileRepository):
-    def _convert_to_repr(self, model_object: FileModel) -> FileRepr:
-        return FileRepr(
-            id=model_object.id,
-            url=model_object.url,
-            time_added=model_object.time_added,
-            directory_id=model_object.directory_id,
-            type=model_object.type,
-            name=model_object.name
-        )
+    def __init__(
+            self, db: sessionmaker, model: Type[FileModel] = FileModel,
+            directory_model: Type[DirectoryModel] = DirectoryModel,
+            converter: Type[FileConverter] = FileConverter
+    ) -> None:
+        self._directory_model = directory_model
 
-    def _convert_to_model(self, repr_object: FileRepr) -> FileModel:
-        return self._model(
-            url=repr_object.url,
-            directory_id=repr_object.directory_id,
-            name=repr_object.name,
-            type=repr_object.type
-        )
+        super().__init__(db, model, converter)
 
     def _select_files(self, user_id: int, directory_id: int) -> Select:
         return select(self._model).join(
@@ -50,7 +44,7 @@ class FileRepository(AFileRepository):
             )
 
         if file:
-            return self._convert_to_repr(file)
+            return self._converter.convert_to_repr(file)
 
     def get_all(
             self, user_id: int, directory_id: int,
@@ -63,7 +57,7 @@ class FileRepository(AFileRepository):
                 ).offset(offset).limit(limit)
             ).all()
 
-        return self._convert_to_repr_list(files)
+        return self._converter.convert_to_repr_list(files)
 
     def delete(self, id_: UUID) -> None:
         with self._transaction() as session:

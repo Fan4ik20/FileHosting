@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Type, Iterable
 
 from sqlalchemy import select, delete
 from sqlalchemy.sql import Select
@@ -7,34 +7,26 @@ from sqlalchemy.orm import sessionmaker, selectinload
 from database.models import Directory
 
 from .abstract.directory_base import ADirectoryRepository
-from .representations.directory import DirectoryRepr
+from .representations import DirectoryRepr, DirectoryReprUpdate
+from .converters import DirectoryConverter
+
+
+__all__ = ['DirectoryRepository']
 
 
 class DirectoryRepository(ADirectoryRepository):
     def __init__(
-            self, db: sessionmaker, model: Type[Directory] = Directory,
+            self, db: sessionmaker,
+            model: Type[Directory] = Directory,
+            converter: Type[DirectoryConverter] = DirectoryConverter
     ) -> None:
-        super().__init__(db, model)
+        super().__init__(db, model, converter)
 
-    def _convert_to_repr(
-            self, model_object: Directory, with_inner=False
-    ) -> DirectoryRepr:
-        return DirectoryRepr(
-            id=model_object.id,
-            user_id=model_object.user_id,
-            name=model_object.name,
-            directory_id=model_object.directory_id,
-            inner_dirs=[
-                self._convert_to_repr(dir_) for dir_ in model_object.inner_dirs
-            ] if with_inner else None
-        )
-
-    def _convert_to_model(self, repr_object: DirectoryRepr) -> Directory:
-        return self._model(
-            user_id=repr_object.user_id,
-            name=repr_object.name,
-            directory_id=repr_object.directory_id
-        )
+    def _update_model(
+            self, dir_model: Directory, dir_repr: DirectoryReprUpdate
+    ) -> None:
+        dir_model.name = dir_repr.name
+        dir_model.directory_id = dir_repr.directory_id
 
     def _select_directories(self, user_id: int) -> Select:
         return select(self._model).filter_by(user_id=user_id)
@@ -50,19 +42,22 @@ class DirectoryRepository(ADirectoryRepository):
                 self._select_ind_directory(user_id, id_)
             )
         if directory:
-            return self._convert_to_repr(directory)
+            return self._converter.convert_to_repr(directory)
 
-    def get_by_id_with_inner(
+    def get_by_id_with_related(
             self, user_id: int, id_: int
     ) -> DirectoryRepr | None:
         with self._transaction() as session:
             directory = session.scalar(
                 self._select_ind_directory(user_id, id_)
-                    .options(selectinload(self._model.inner_dirs))
+                .options(
+                    selectinload(self._model.inner_dirs),
+                    selectinload(self._model.files)
+                )
             )
 
         if directory:
-            return self._convert_to_repr(directory, with_inner=True)
+            return self._converter.convert_to_repr(directory, related=True)
 
     def get_by_name(self, user_id: int, name: str) -> DirectoryRepr | None:
         with self._transaction() as session:
@@ -70,20 +65,50 @@ class DirectoryRepository(ADirectoryRepository):
                 self._select_directories(user_id).filter_by(name=name)
             )
         if directory:
-            return self._convert_to_repr(directory)
+            return self._converter.convert_to_repr(directory)
+
+    def get_all_without_parent(
+            self, user_id: int, offset: int = 0, limit: int = 100
+    ) -> Iterable[DirectoryRepr]:
+        with self._transaction() as session:
+            directories = session.scalars(
+                self._select_directories(user_id).filter(
+                    self._model.directory_id.is_(None)
+                ).offset(offset).limit(limit)
+            ).all()
+
+        return self._converter.convert_to_repr_list(directories)
 
     def get_all(
             self, user_id: int, offset: int = 0, limit: int = 100
-    ) -> list[DirectoryRepr]:
+    ) -> Iterable[DirectoryRepr]:
         with self._transaction() as session:
             directories = session.scalars(
                 self._select_directories(user_id).offset(offset).limit(limit)
             ).all()
 
-        return self._convert_to_repr_list(directories)
+        return self._converter.convert_to_repr_list(directories)
 
     def delete(self, id_: int) -> None:
         with self._transaction() as session:
             session.execute(delete(self._model).filter_by(id=id_))
 
             session.commit()
+
+    def update(
+            self, user_id: int, id_: int, dir_repr: DirectoryReprUpdate
+    ) -> DirectoryRepr | None:
+        with self._transaction() as session:
+            directory = session.scalar(
+                self._select_ind_directory(user_id, id_)
+            )
+
+            if not directory:
+                return None
+
+            self._update_model(directory, dir_repr)
+
+            session.commit()
+            session.refresh(directory)
+
+        return self._converter.convert_to_repr(directory)

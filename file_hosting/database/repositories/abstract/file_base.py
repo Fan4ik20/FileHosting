@@ -1,11 +1,9 @@
-from typing import Type
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from sqlalchemy.orm import sessionmaker
-
-from database.models import File as FileModel, Directory as DirectoryModel
+from database.models import File as FileModel
 from database.repositories.representations import FileRepr
+from database.repositories.converters import FileConverter
 
 from .base import BaseRepository
 
@@ -13,23 +11,7 @@ from .base import BaseRepository
 __all__ = ['AFileRepository']
 
 
-class AFileRepository(ABC, BaseRepository[FileModel, FileRepr]):
-    def __init__(
-            self, db: sessionmaker, model: Type[FileModel] = FileModel,
-            directory_model: Type[DirectoryModel] = DirectoryModel
-    ) -> None:
-        self._directory_model = directory_model
-
-        super().__init__(db, model)
-
-    @abstractmethod
-    def _convert_to_repr(self, model_object: FileModel) -> FileRepr:
-        pass
-
-    @abstractmethod
-    def _convert_to_model(self, repr_object: FileRepr) -> FileModel:
-        pass
-
+class AFileRepository(ABC, BaseRepository[FileModel, FileRepr, FileConverter]):
     @abstractmethod
     def get_by_id(
             self, user_id: int, directory_id: int, file_id: UUID

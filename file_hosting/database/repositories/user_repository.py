@@ -1,4 +1,7 @@
+from typing import Type
+
 from sqlalchemy import delete, select
+from sqlalchemy.orm import sessionmaker
 
 from database.models import User as UserModel
 
@@ -6,26 +9,18 @@ from common.utils.passwords import get_password_hash
 
 from .abstract.user_base import AUserRepository
 from .representations import UserRepr
+from .converters import UserConverter
 
 
 __all__ = ['UserRepository']
 
 
 class UserRepository(AUserRepository):
-    def _convert_to_repr(self, model_object: UserModel) -> UserRepr:
-        return UserRepr(
-            id=model_object.id,
-            username=model_object.username,
-            email=model_object.email,
-            password=model_object.password
-        )
-
-    def _convert_to_model(self, repr_object: UserRepr) -> UserModel:
-        return self._model(
-            username=repr_object.username,
-            email=repr_object.email,
-            password=repr_object.password
-        )
+    def __init__(
+            self, db: sessionmaker, model: Type[UserModel] = UserModel,
+            converter: Type[UserConverter] = UserConverter
+    ):
+        super().__init__(db, model, converter)
 
     def create(self, repr_object: UserRepr) -> UserRepr:
         repr_object.password = get_password_hash(repr_object.password)
@@ -37,7 +32,7 @@ class UserRepository(AUserRepository):
             user = session.get(self._model, id_)
 
         if user:
-            return self._convert_to_repr(user)
+            return self._converter.convert_to_repr(user)
 
     def get_by_username(self, username: str) -> UserRepr | None:
         with self._transaction() as session:
@@ -46,7 +41,7 @@ class UserRepository(AUserRepository):
             )
 
         if user:
-            return self._convert_to_repr(user)
+            return self._converter.convert_to_repr(user)
 
     def get_by_email(self, email: str) -> UserRepr | None:
         with self._transaction() as session:
@@ -55,7 +50,7 @@ class UserRepository(AUserRepository):
             )
 
         if user:
-            return self._convert_to_repr(user)
+            return self._converter.convert_to_repr(user)
 
     def get_all(self, offset: int = 0, limit: int = 100) -> list[UserRepr]:
         with self._transaction() as session:
@@ -63,7 +58,7 @@ class UserRepository(AUserRepository):
                 select(self._model).offset(offset).limit(limit)
             ).all()
 
-        return self._convert_to_repr_list(users)
+        return self._converter.convert_to_repr_list(users)
 
     def delete(self, id_: int) -> None:
         with self._transaction() as session:

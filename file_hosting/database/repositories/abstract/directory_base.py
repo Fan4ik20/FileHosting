@@ -1,11 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Type
-
-from sqlalchemy.orm import sessionmaker
 
 from database.models import Directory as DirectoryModel
 from database.repositories.representations import \
     DirectoryRepr, DirectoryReprUpdate
+from database.repositories.converters import DirectoryConverter
 
 from .base import BaseRepository
 
@@ -13,21 +11,9 @@ from .base import BaseRepository
 __all__ = ['ADirectoryRepository']
 
 
-class ADirectoryRepository(ABC, BaseRepository[DirectoryModel, DirectoryRepr]):
-    def __init__(
-            self, db: sessionmaker,
-            model: Type[DirectoryModel] = DirectoryModel
-    ) -> None:
-        super().__init__(db, model)
-
-    @abstractmethod
-    def _convert_to_repr(self, model_object: DirectoryModel) -> DirectoryRepr:
-        pass
-
-    @abstractmethod
-    def _convert_to_model(self, repr_object: DirectoryRepr) -> DirectoryModel:
-        pass
-
+class ADirectoryRepository(
+    ABC, BaseRepository[DirectoryModel, DirectoryRepr, DirectoryConverter]
+):
     @abstractmethod
     def _update_model(
             self, dir_model: DirectoryModel, dir_repr: DirectoryRepr

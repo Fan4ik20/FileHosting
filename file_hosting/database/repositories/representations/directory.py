@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from .file import FileRepr
+
 
 __all__ = ['DirectoryRepr', 'DirectoryReprUpdate']
 
@@ -10,8 +12,8 @@ class DirectoryRepr:
     user_id: int
 
     directory_id: int | None = None
-    inner_dirs: list | None = None
-    files: list | None = None
+    inner_dirs: list['DirectoryRepr'] | None = None
+    files: list[FileRepr] | None = None
     id: int | None = None
 
 
