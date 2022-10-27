@@ -6,6 +6,9 @@ from .abstract.user_base import AUserService
 from .exceptions import user_exc
 
 
+__all__ = ['UserService']
+
+
 class UserService(AUserService):
     def _get_user_or_raise_exc(self, id_: int) -> UserRepr:
         user = self._repository.get_by_id(id_)

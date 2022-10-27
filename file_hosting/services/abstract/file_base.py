@@ -10,6 +10,9 @@ from database.repositories import (
 from database.repositories.representations import FileRepr
 
 
+__all__ = ['AFileService']
+
+
 class AFileService(ABC, ServiceBase[IFileRepository, FileRepr]):
     def __init__(
             self, repository: IFileRepository,

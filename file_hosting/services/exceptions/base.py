@@ -1,3 +1,6 @@
+__all__ = ['NotFoundError', 'AlreadyExistError', 'CantDeleteError']
+
+
 class NotFoundError(Exception):
     model: str
 

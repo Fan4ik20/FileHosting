@@ -7,6 +7,9 @@ from database.repositories import IDirectoryRepository, IUserRepository
 from database.repositories.representations import DirectoryRepr
 
 
+__all__ = ['ADirectoryService']
+
+
 class ADirectoryService(ABC, ServiceBase[IDirectoryRepository, DirectoryRepr]):
     def __init__(
             self, repository: IDirectoryRepository,

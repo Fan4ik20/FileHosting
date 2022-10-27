@@ -7,7 +7,10 @@ from database.repositories import IUserRepository
 from database.repositories.representations import UserRepr
 
 
-class AUserService(ABC, ServiceBase[AUserRepository, UserRepr]):
+__all__ = ['AUserService']
+
+
+class AUserService(ABC, ServiceBase[IUserRepository, UserRepr]):
     @abstractmethod
     def get(self, user_id: int) -> UserRepr:
         pass

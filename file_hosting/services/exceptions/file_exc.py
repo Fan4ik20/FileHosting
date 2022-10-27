@@ -1,6 +1,9 @@
 from .base import NotFoundError
 
 
+__all__ = ['FileNotFound']
+
+
 class _FileExcBase(Exception):
     model = 'File'
 

@@ -1,6 +1,12 @@
 from .base import NotFoundError, AlreadyExistError, CantDeleteError
 
 
+__all__ = [
+    'DirectoryNotFound', 'DirectoryWithNameAlreadyExist',
+    'DirectoryCantBeDeleted'
+]
+
+
 class _DirectoryBaseError(Exception):
     model = 'Directory'
 

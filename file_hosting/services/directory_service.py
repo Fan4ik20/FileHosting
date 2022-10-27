@@ -1,10 +1,14 @@
 from typing import Iterable
 
-from database.repositories.directory_repository import DirectoryRepr
-from database.repositories.user_repository import UserRepr
+from database.repositories.representations import (
+    DirectoryRepr, DirectoryReprUpdate, UserRepr
+)
 
-from services.abstract.directory_base import ADirectoryService
+from .abstract.directory_base import ADirectoryService
 from .exceptions import user_exc, directory_exc
+
+
+__all__ = ['DirectoryService']
 
 
 class DirectoryService(ADirectoryService):
@@ -17,11 +21,11 @@ class DirectoryService(ADirectoryService):
         return user
 
     def _get_directory_or_raise_exc(
-            self, user_id: int, directory_id: int, with_inner: bool = False
+            self, user_id: int, directory_id: int, related: bool = False
     ) -> DirectoryRepr:
         directory = (
-            self._repository.get_by_id(user_id, directory_id) if not with_inner
-            else self._repository.get_by_id_with_inner(user_id, directory_id)
+            self._repository.get_by_id(user_id, directory_id) if not related
+            else self._repository.get_by_id_with_related(user_id, directory_id)
         )
 
         if directory is None:
@@ -48,7 +52,7 @@ class DirectoryService(ADirectoryService):
 
         self._get_user_or_raise_exc(user_id)
 
-        return self._repository.get_all(user_id, offset, limit)
+        return self._repository.get_all_without_parent(user_id, offset, limit)
 
     def create(self, directory_repr: DirectoryRepr) -> DirectoryRepr:
         """Raises: UserNotFound, DirectoryWithNameAlreadyExist"""
@@ -69,3 +73,20 @@ class DirectoryService(ADirectoryService):
         directory = self._get_directory_or_raise_exc(user_id, directory_id)
 
         self._repository.delete(directory.id)
+
+    def update(
+            self, user_id: int, directory_id: int,
+            dir_repr: DirectoryReprUpdate
+    ) -> DirectoryRepr:
+        """Raises: UserNotFound, DirectoryNotFound"""
+
+        self._get_user_or_raise_exc(user_id)
+
+        updated_directory = self._repository.update(
+            user_id, directory_id, dir_repr
+        )
+
+        if updated_directory is None:
+            raise directory_exc.DirectoryNotFound
+
+        return updated_directory

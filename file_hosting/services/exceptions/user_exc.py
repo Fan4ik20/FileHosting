@@ -1,6 +1,12 @@
 from .base import NotFoundError, AlreadyExistError, CantDeleteError
 
 
+__all__ = [
+    'UserNotFound', 'UserWithEmailExist',
+    'UserWithUsernameExist', 'UserCantBeDeleted'
+]
+
+
 class _BaseUserError(Exception):
     model = 'User'
 

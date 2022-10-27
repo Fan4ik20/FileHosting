@@ -9,6 +9,9 @@ from .abstract.file_base import AFileService
 from .exceptions import user_exc, directory_exc, file_exc
 
 
+__all__ = ['FileService']
+
+
 class FileService(AFileService):
     def _get_user_or_raise_exc(self, user_id: int) -> UserRepr:
         user = self._user_repository.get_by_id(user_id)
