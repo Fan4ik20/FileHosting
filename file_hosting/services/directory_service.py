@@ -35,14 +35,14 @@ class DirectoryService(ADirectoryService):
 
     def get(
             self, user_id: int, directory_id: int,
-            with_inner: bool = False
+            related: bool = False
     ) -> DirectoryRepr:
         """Raises: UserNotFound, DirectoryNotFound"""
 
         self._get_user_or_raise_exc(user_id)
 
         return self._get_directory_or_raise_exc(
-            user_id, directory_id, with_inner
+            user_id, directory_id, related=related
         )
 
     def get_all(

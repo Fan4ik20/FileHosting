@@ -65,7 +65,9 @@ def create_directory(
         raise http_exc.ObjectAlreadyExistInBody(err.model, err.attr)
 
 
-@router.get('/{directory_id}/', response_model=directory_sch.DirectoryGet)
+@router.get(
+    '/{directory_id}/', response_model=directory_sch.DirectoryGetDetail
+)
 def get_directory(
         directory_id: int,
         active_user: UserRepr = Depends(ActiveUserS),
@@ -73,9 +75,10 @@ def get_directory(
 ):
     try:
         directory = directory_service.get(
-            active_user.id, directory_id, with_inner=True
+            active_user.id, directory_id, related=True
         )
 
+        print(directory.files)
         print(directory.inner_dirs)
         return directory
     except service_exc.NotFoundError as err:

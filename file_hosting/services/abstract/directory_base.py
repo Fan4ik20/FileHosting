@@ -21,7 +21,7 @@ class ADirectoryService(ABC, ServiceBase[IDirectoryRepository, DirectoryRepr]):
 
     @abstractmethod
     def get(
-            self, user_id: int, directory_id: int, with_inner: bool = False
+            self, user_id: int, directory_id: int, related: bool = False
     ) -> DirectoryRepr:
         pass
 

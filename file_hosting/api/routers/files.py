@@ -23,7 +23,7 @@ def _map_schema_to_repr(directory_id: int, file_sch: FilePost) -> FileRepr:
         url=file_sch.url,
         directory_id=directory_id,
         type=file_sch.type,
-        name=file_sch.type
+        name=file_sch.name
     )
 
 
