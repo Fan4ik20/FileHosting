@@ -3,6 +3,9 @@ from datetime import datetime
 from uuid import UUID
 
 
+__all__ = ['FileRepr']
+
+
 @dataclass
 class FileRepr:
     url: str

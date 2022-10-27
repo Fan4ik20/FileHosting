@@ -6,7 +6,10 @@ from sqlalchemy.orm import sessionmaker
 from .base import BaseRepository
 
 from database.models import User as UserModel
-from database.repositories.representations.user import UserRepr
+from database.repositories.representations import UserRepr
+
+
+__all__ = ['AUserRepository']
 
 
 class AUserRepository(ABC, BaseRepository[UserModel, UserRepr]):

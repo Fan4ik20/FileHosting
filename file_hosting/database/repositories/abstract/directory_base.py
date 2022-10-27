@@ -4,9 +4,13 @@ from typing import Type
 from sqlalchemy.orm import sessionmaker
 
 from database.models import Directory as DirectoryModel
-from database.repositories.representations.directory import DirectoryRepr
+from database.repositories.representations import \
+    DirectoryRepr, DirectoryReprUpdate
 
 from .base import BaseRepository
+
+
+__all__ = ['ADirectoryRepository']
 
 
 class ADirectoryRepository(ABC, BaseRepository[DirectoryModel, DirectoryRepr]):
@@ -25,19 +29,31 @@ class ADirectoryRepository(ABC, BaseRepository[DirectoryModel, DirectoryRepr]):
         pass
 
     @abstractmethod
+    def _update_model(
+            self, dir_model: DirectoryModel, dir_repr: DirectoryRepr
+    ) -> None:
+        pass
+
+    @abstractmethod
     def get_by_id(
             self, user_id: int, directory_id: int
     ) -> DirectoryRepr | None:
         pass
 
     @abstractmethod
-    def get_by_id_with_inner(
+    def get_by_id_with_related(
             self, user_id: int, id_: int
     ) -> DirectoryRepr | None:
         pass
 
     @abstractmethod
     def get_by_name(self, user_id: int, name: str) -> DirectoryRepr | None:
+        pass
+
+    @abstractmethod
+    def get_all_without_parent(
+            self, user_id: int, offset: int = 0, limit: int = 100
+    ) -> list[DirectoryRepr]:
         pass
 
     @abstractmethod
@@ -48,4 +64,10 @@ class ADirectoryRepository(ABC, BaseRepository[DirectoryModel, DirectoryRepr]):
 
     @abstractmethod
     def delete(self, id_: int) -> None:
+        pass
+
+    @abstractmethod
+    def update(
+            self, user_id: int, id_: int, dir_repr: DirectoryReprUpdate
+    ) -> DirectoryRepr:
         pass

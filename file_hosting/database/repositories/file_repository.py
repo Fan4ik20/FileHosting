@@ -6,7 +6,10 @@ from sqlalchemy.sql import Select
 from database.models import File as FileModel
 
 from .abstract.file_base import AFileRepository
-from .representations.file import FileRepr
+from .representations import FileRepr
+
+
+__all__ = ['FileRepository']
 
 
 class FileRepository(AFileRepository):

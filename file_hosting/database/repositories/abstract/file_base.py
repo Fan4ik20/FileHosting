@@ -5,9 +5,12 @@ from uuid import UUID
 from sqlalchemy.orm import sessionmaker
 
 from database.models import File as FileModel, Directory as DirectoryModel
-from database.repositories.representations.file import FileRepr
+from database.repositories.representations import FileRepr
 
 from .base import BaseRepository
+
+
+__all__ = ['AFileRepository']
 
 
 class AFileRepository(ABC, BaseRepository[FileModel, FileRepr]):

@@ -5,7 +5,10 @@ from database.models import User as UserModel
 from common.utils.passwords import get_password_hash
 
 from .abstract.user_base import AUserRepository
-from .representations.user import UserRepr
+from .representations import UserRepr
+
+
+__all__ = ['UserRepository']
 
 
 class UserRepository(AUserRepository):
