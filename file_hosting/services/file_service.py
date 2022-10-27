@@ -1,9 +1,9 @@
 from typing import Iterable
 from uuid import UUID
 
-from database.repositories.directory_repository import DirectoryRepr
-from database.repositories.user_repository import UserRepr
-from database.repositories.file_repository import FileRepr
+from database.repositories.representations import (
+    DirectoryRepr, UserRepr, FileRepr
+)
 
 from .abstract.file_base import AFileService
 from .exceptions import user_exc, directory_exc, file_exc

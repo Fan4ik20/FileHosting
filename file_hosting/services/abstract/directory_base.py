@@ -3,15 +3,14 @@ from typing import Iterable
 
 from .base import ServiceBase
 
-from database.repositories.abstract.directory_base import \
-    ADirectoryRepository, DirectoryRepr
-from database.repositories.abstract.user_base import AUserRepository
+from database.repositories import IDirectoryRepository, IUserRepository
+from database.repositories.representations import DirectoryRepr
 
 
-class ADirectoryService(ABC, ServiceBase[ADirectoryRepository, DirectoryRepr]):
+class ADirectoryService(ABC, ServiceBase[IDirectoryRepository, DirectoryRepr]):
     def __init__(
-            self, repository: ADirectoryRepository,
-            user_repository: AUserRepository
+            self, repository: IDirectoryRepository,
+            user_repository: IUserRepository
     ) -> None:
         self._user_repository = user_repository
 
@@ -33,4 +32,10 @@ class ADirectoryService(ABC, ServiceBase[ADirectoryRepository, DirectoryRepr]):
 
     @abstractmethod
     def delete(self, user_id: int, directory_id: int) -> None:
+        pass
+
+    @abstractmethod
+    def update(
+            self, user_id: int, directory_id: int, dir_repr: DirectoryRepr
+    ) -> DirectoryRepr:
         pass

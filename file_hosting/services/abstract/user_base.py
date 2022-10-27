@@ -3,7 +3,8 @@ from typing import Iterable
 
 from .base import ServiceBase
 
-from database.repositories.abstract.user_base import AUserRepository, UserRepr
+from database.repositories import IUserRepository
+from database.repositories.representations import UserRepr
 
 
 class AUserService(ABC, ServiceBase[AUserRepository, UserRepr]):

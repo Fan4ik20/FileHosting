@@ -1,6 +1,6 @@
 from typing import Iterable
 
-from database.repositories.user_repository import UserRepr
+from database.repositories.representations import UserRepr
 
 from .abstract.user_base import AUserService
 from .exceptions import user_exc

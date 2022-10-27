@@ -4,16 +4,17 @@ from uuid import UUID
 
 from .base import ServiceBase
 
-from database.repositories.abstract.user_base import AUserRepository
-from database.repositories.abstract.directory_base import ADirectoryRepository
-from database.repositories.abstract.file_base import AFileRepository, FileRepr
+from database.repositories import (
+    IUserRepository, IDirectoryRepository, IFileRepository
+)
+from database.repositories.representations import FileRepr
 
 
-class AFileService(ABC, ServiceBase[AFileRepository, FileRepr]):
+class AFileService(ABC, ServiceBase[IFileRepository, FileRepr]):
     def __init__(
-            self, repository: AFileRepository,
-            user_repository: AUserRepository,
-            directory_repository: ADirectoryRepository
+            self, repository: IFileRepository,
+            user_repository: IUserRepository,
+            directory_repository: IDirectoryRepository
     ) -> None:
         self._user_repository = user_repository
         self._directory_repository = directory_repository
