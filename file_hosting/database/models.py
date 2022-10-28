@@ -38,7 +38,7 @@ class Directory(HostingBase):
         'Directory', backref=backref('external_dir', remote_side=[id])
     )
 
-    __table_args__ = (UniqueConstraint('name', 'user_id'),)
+    __table_args__ = (UniqueConstraint('name', 'user_id', 'directory_id'),)
 
 
 class File(HostingBase):

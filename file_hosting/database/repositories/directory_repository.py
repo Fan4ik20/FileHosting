@@ -25,8 +25,9 @@ class DirectoryRepository(ADirectoryRepository):
     def _update_model(
             self, dir_model: Directory, dir_repr: DirectoryReprUpdate
     ) -> None:
-        dir_model.name = dir_repr.name
-        dir_model.directory_id = dir_repr.directory_id
+        for attr, value in vars(dir_repr).items():
+            if value and hasattr(dir_model, attr):
+                setattr(dir_model, attr, value)
 
     def _select_directories(self, user_id: int) -> Select:
         return select(self._model).filter_by(user_id=user_id)
@@ -59,10 +60,13 @@ class DirectoryRepository(ADirectoryRepository):
         if directory:
             return self._converter.convert_to_repr(directory, related=True)
 
-    def get_by_name(self, user_id: int, name: str) -> DirectoryRepr | None:
+    def get_by_name(
+            self, user_id: int, name: str, out_directory_id: int | None = None
+    ) -> DirectoryRepr | None:
         with self._transaction() as session:
             directory = session.scalar(
-                self._select_directories(user_id).filter_by(name=name)
+                self._select_directories(user_id)
+                    .filter_by(name=name, directory_id=out_directory_id)
             )
         if directory:
             return self._converter.convert_to_repr(directory)

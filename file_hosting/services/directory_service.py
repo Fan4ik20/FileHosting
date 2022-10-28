@@ -82,6 +82,11 @@ class DirectoryService(ADirectoryService):
 
         self._get_user_or_raise_exc(user_id)
 
+        if self._repository.get_by_name(
+                user_id, dir_repr.name, dir_repr.directory_id
+        ):
+            raise directory_exc.DirectoryWithNameAlreadyExist
+
         updated_directory = self._repository.update(
             user_id, directory_id, dir_repr
         )

@@ -33,7 +33,9 @@ class ADirectoryRepository(
         pass
 
     @abstractmethod
-    def get_by_name(self, user_id: int, name: str) -> DirectoryRepr | None:
+    def get_by_name(
+            self, user_id: int, name: str, out_directory_id: int | None = None
+    ) -> DirectoryRepr | None:
         pass
 
     @abstractmethod
