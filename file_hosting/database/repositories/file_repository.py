@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Type
+from typing import Type, Iterable
 
 from sqlalchemy import select, delete
 from sqlalchemy.orm import sessionmaker
@@ -49,7 +49,7 @@ class FileRepository(AFileRepository):
     def get_all(
             self, user_id: int, directory_id: int,
             offset: int = 0, limit: int = 100
-    ) -> list[FileRepr]:
+    ) -> Iterable[FileRepr]:
         with self._transaction() as session:
             files = session.scalars(
                 self._select_files(

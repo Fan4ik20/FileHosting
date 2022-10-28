@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Type, Iterable
 
 from sqlalchemy import delete, select
 from sqlalchemy.orm import sessionmaker
@@ -52,7 +52,7 @@ class UserRepository(AUserRepository):
         if user:
             return self._converter.convert_to_repr(user)
 
-    def get_all(self, offset: int = 0, limit: int = 100) -> list[UserRepr]:
+    def get_all(self, offset: int = 0, limit: int = 100) -> Iterable[UserRepr]:
         with self._transaction() as session:
             users = session.scalars(
                 select(self._model).offset(offset).limit(limit)
