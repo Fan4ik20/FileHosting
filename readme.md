@@ -27,3 +27,6 @@ Or
   `docker compose stop`
   - To remove the containers use  
   `docker compose down`
+## Additional
+- Swagger can be founded on  
+`/api/v1/docs/`
