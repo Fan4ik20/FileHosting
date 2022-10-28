@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import Response
 
-from database.repositories.representations import DirectoryRepr, UserRepr
+from database.repositories.representations import (
+    DirectoryRepr, UserRepr, DirectoryReprUpdate
+)
 
 
 from services import IDirectoryService
@@ -28,6 +30,12 @@ def _map_schema_to_repr(
         user_id=user_id,
         directory_id=directory.directory_id
     )
+
+
+def _map_schema_to_repr_update(
+        directory: directory_sch.DirectoryPatch
+) -> DirectoryReprUpdate:
+    return DirectoryReprUpdate(**directory.dict(exclude_unset=True))
 
 
 @router.get('/', response_model=list[directory_sch.DirectoryGet])
@@ -78,8 +86,6 @@ def get_directory(
             active_user.id, directory_id, related=True
         )
 
-        print(directory.files)
-        print(directory.inner_dirs)
         return directory
     except service_exc.NotFoundError as err:
         raise http_exc.ObjectNotExistInPath(err.model)
@@ -96,5 +102,26 @@ def delete_directory(
 ):
     try:
         directory_service.delete(active_user.id, directory_id)
+    except service_exc.NotFoundError as err:
+        raise http_exc.ObjectNotExistInPath(err.model)
+
+
+@router.patch(
+    '/{directory_id}/', response_model=directory_sch.DirectoryGet
+)
+def patch_directory(
+        directory_id: int,
+        directory_patch: directory_sch.DirectoryPatch,
+        active_user: UserRepr = Depends(ActiveUserS),
+        directory_service: IDirectoryService = Depends(DirectoryServiceS)
+):
+    directory_repr = _map_schema_to_repr_update(directory_patch)
+
+    try:
+        return directory_service.update(
+            active_user.id, directory_id, directory_repr
+        )
+    except service_exc.AlreadyExistError as err:
+        raise http_exc.ObjectAlreadyExistInBody(err.model, err.attr)
     except service_exc.NotFoundError as err:
         raise http_exc.ObjectNotExistInPath(err.model)

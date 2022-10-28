@@ -29,3 +29,8 @@ class DirectoryGetDetail(DirectorySchemaBase):
 
     class Config:
         orm_mode = True
+
+
+class DirectoryPatch(BaseModel):
+    name: str | None = None
+    directory_id: PositiveInt | None = None
