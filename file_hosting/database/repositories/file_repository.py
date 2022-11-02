@@ -59,3 +59,4 @@ class FileRepository(AFileRepository):
 
     def delete(self, id_: UUID) -> None:
         self._session.execute(delete(self._model).filter_by(id=id_))
+        self._session.commit()
