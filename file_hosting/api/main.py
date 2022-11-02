@@ -7,23 +7,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi_jwt_auth import AuthJWT
 
-from sqlalchemy.orm import DeclarativeMeta, sessionmaker
+from sqlalchemy.orm import DeclarativeMeta
 
 from config import DatabaseSettings, JWTSettings
 
 from database import utils as db_utils
 from database.models import HostingBase
 
-from .dependencies.stubs import auth as auth_s
-from .dependencies.stubs import services as services_s
-
-from .dependencies import utils as dependency_utils
-
-from database.repositories import (
-    UserRepository, DirectoryRepository, FileRepository
-)
-
-from services import UserService, DirectoryService, FileService
+from .dependencies import stubs
+from .dependencies import providers
 
 from .routers import hosting_router
 from .exceptions import handlers
@@ -49,17 +41,13 @@ def _include_handlers(app: FastAPI) -> None:
     )
 
 
-def _include_services(app: FastAPI, session_maker: sessionmaker) -> None:
-    user_rep = UserRepository(session_maker)
-    directory_rep = DirectoryRepository(session_maker)
-    file_rep = FileRepository(session_maker)
-
-    app.dependency_overrides[services_s.UserServiceS] = \
-        lambda: UserService(user_rep)
-    app.dependency_overrides[services_s.DirectoryServiceS] = \
-        lambda: DirectoryService(directory_rep, user_rep)
-    app.dependency_overrides[services_s.FileServiceS] = \
-        lambda: FileService(file_rep, user_rep, directory_rep)
+def _include_services(app: FastAPI) -> None:
+    app.dependency_overrides[stubs.UserServiceS] = \
+        providers.UserServiceProvider()
+    app.dependency_overrides[stubs.FileServiceS] = \
+        providers.FileServiceProvider()
+    app.dependency_overrides[stubs.DirectoryServiceS] = \
+        providers.DirectoryServiceProvider()
 
 
 def _include_database(
@@ -68,14 +56,15 @@ def _include_database(
     engine = db_utils.create_engine(config)
     session_maker = db_utils.create_session_maker(engine)
 
-    _include_services(app, session_maker)
+    app.dependency_overrides[stubs.SessionS] = \
+        providers.DatabaseProvider(session_maker)
 
     db_utils.create_tables(base, engine)
 
 
 def _include_auth(app: FastAPI) -> None:
-    app.dependency_overrides[auth_s.ActiveUserS] = \
-        dependency_utils.get_current_user
+    app.dependency_overrides[stubs.ActiveUserS] = \
+        providers.ActiveUserProvider()
 
 
 def _include_cors(app: FastAPI, origins: list[str]) -> None:
@@ -101,6 +90,7 @@ def create_app() -> FastAPI:
     origins = ['*']
 
     _include_database(app, db_config, HostingBase)
+    _include_services(app)
     _include_routers(app)
     _include_handlers(app)
     _include_cors(app, origins)

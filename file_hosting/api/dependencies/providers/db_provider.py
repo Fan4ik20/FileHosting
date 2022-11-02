@@ -4,6 +4,9 @@ from sqlalchemy.orm import sessionmaker
 from .typing_ import DbSession
 
 
+__all__ = ['DatabaseProvider']
+
+
 class DatabaseProvider:
     def __init__(self, session_maker: sessionmaker) -> None:
         self._session_maker = session_maker
