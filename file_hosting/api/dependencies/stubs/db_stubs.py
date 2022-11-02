@@ -1,6 +1,6 @@
-__all__ = ['ActiveUserS']
+__all__ = ['SessionS']
 
 
-class ActiveUserS:
+class SessionS:
     def __init__(self) -> None:
         raise NotImplementedError
