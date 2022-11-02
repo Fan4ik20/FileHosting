@@ -15,12 +15,6 @@ class ADirectoryRepository(
     ABC, BaseRepository[DirectoryModel, DirectoryRepr, DirectoryConverter]
 ):
     @abstractmethod
-    def _update_model(
-            self, dir_model: DirectoryModel, dir_repr: DirectoryRepr
-    ) -> None:
-        pass
-
-    @abstractmethod
     def get_by_id(
             self, user_id: int, directory_id: int
     ) -> DirectoryRepr | None:

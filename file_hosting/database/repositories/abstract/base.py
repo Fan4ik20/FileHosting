@@ -1,8 +1,6 @@
 from typing import Generic, TypeVar, Type, TypeAlias
 
-from contextlib import contextmanager
-
-from sqlalchemy.orm import sessionmaker, Session
+from database.repositories.typing_ import DbSession
 
 
 Model = TypeVar('Model')
@@ -14,17 +12,12 @@ identifier: TypeAlias = int | str
 
 class BaseRepository(Generic[Model, Repr, Converter]):
     def __init__(
-            self, db: sessionmaker, model: Type[Model],
+            self, session: DbSession, model: Type[Model],
             converter: Type[Converter]
     ) -> None:
-        self._db = db
+        self._session = session
         self._model = model
         self._converter = converter
-
-    @contextmanager
-    def _transaction(self) -> Session:
-        with self._db() as session:
-            yield session
 
     def get_by_id(self, *args) -> Repr:
         raise NotImplementedError
@@ -37,11 +30,10 @@ class BaseRepository(Generic[Model, Repr, Converter]):
     def create(self, repr_object: Repr) -> Repr:
         new_object = self._converter.convert_to_model(repr_object)
 
-        with self._transaction() as session:
-            session.add(new_object)
-            session.commit()
+        self._session.add(new_object)
+        self._session.commit()
 
-            session.refresh(new_object)
+        self._session.refresh(new_object)
 
         return self._converter.convert_to_repr(new_object)
 
