@@ -1,30 +1,36 @@
 from abc import ABC, abstractmethod
+from typing import Iterable
 
 from .base import BaseRepository
 
 from database.models import User as UserModel
-from database.repositories.representations import UserRepr
-from database.repositories.converters import UserConverter
+
+from database.repositories.dto import UserDTO, UserCreateDTO, UserUpdateDTO
+from ..converters import UserConverter
 
 
 __all__ = ['AUserRepository']
 
 
-class AUserRepository(ABC, BaseRepository[UserModel, UserRepr, UserConverter]):
+class AUserRepository(
+    ABC, BaseRepository[
+        UserModel, UserCreateDTO, UserDTO, UserUpdateDTO, UserConverter
+    ]
+):
     @abstractmethod
-    def get_by_id(self, id_: int) -> UserRepr | None:
+    def get_by_id(self, id_: int) -> UserDTO | None:
         pass
 
     @abstractmethod
-    def get_by_username(self, username: str) -> UserRepr | None:
+    def get_by_username(self, username: str) -> UserDTO | None:
         pass
 
     @abstractmethod
-    def get_by_email(self, email: str) -> UserRepr | None:
+    def get_by_email(self, email: str) -> UserDTO | None:
         pass
 
     @abstractmethod
-    def get_all(self, offset: int = 0, limit: int = 100) -> list[UserRepr]:
+    def get_all(self, offset: int = 0, limit: int = 100) -> Iterable[UserDTO]:
         pass
 
     @abstractmethod

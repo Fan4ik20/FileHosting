@@ -4,10 +4,8 @@ from sqlalchemy import delete, select
 
 from database.models import User as UserModel
 
-from common.utils.passwords import get_password_hash
-
 from .abstract.user_base import AUserRepository
-from .representations import UserRepr
+from .dto import UserDTO
 from .converters import UserConverter
 from .typing_ import DbSession
 
@@ -22,34 +20,26 @@ class UserRepository(AUserRepository):
     ):
         super().__init__(session, model, converter)
 
-    def create(self, repr_object: UserRepr) -> UserRepr:
-        repr_object.password = get_password_hash(repr_object.password)
-
-        return super(UserRepository, self).create(repr_object)
-
-    def get_by_id(self, id_: int) -> UserRepr | None:
+    def get_by_id(self, id_: int) -> UserDTO | None:
         user = self._session.get(self._model, id_)
 
-        if user:
-            return self._converter.convert_to_repr(user)
+        return self._converter.convert_to_repr(user) if user else None
 
-    def get_by_username(self, username: str) -> UserRepr | None:
+    def get_by_username(self, username: str) -> UserDTO | None:
         user = self._session.scalar(
             select(self._model).filter_by(username=username)
         )
 
-        if user:
-            return self._converter.convert_to_repr(user)
+        return self._converter.convert_to_repr(user) if user else None
 
-    def get_by_email(self, email: str) -> UserRepr | None:
+    def get_by_email(self, email: str) -> UserDTO | None:
         user = self._session.scalar(
             select(self._model).filter_by(email=email)
         )
 
-        if user:
-            return self._converter.convert_to_repr(user)
+        return self._converter.convert_to_repr(user) if user else None
 
-    def get_all(self, offset: int = 0, limit: int = 100) -> Iterable[UserRepr]:
+    def get_all(self, offset: int = 0, limit: int = 100) -> Iterable[UserDTO]:
         users = self._session.scalars(
             select(self._model).offset(offset).limit(limit)
         ).all()

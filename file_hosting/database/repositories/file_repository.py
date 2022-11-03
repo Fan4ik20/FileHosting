@@ -7,7 +7,7 @@ from sqlalchemy.sql import Select
 from database.models import File as FileModel, Directory as DirectoryModel
 
 from .abstract.file_base import AFileRepository
-from .representations import FileRepr
+from .dto import FileDTO
 from .converters import FileConverter
 from .typing_ import DbSession
 
@@ -35,20 +35,19 @@ class FileRepository(AFileRepository):
 
     def get_by_id(
             self, user_id: int, directory_id: int, id_: UUID
-    ) -> FileRepr:
+    ) -> FileDTO | None:
         file = self._session.scalar(
             self._select_files(user_id, directory_id).filter(
                 self._model.id == id_
             )
         )
 
-        if file:
-            return self._converter.convert_to_repr(file)
+        return self._converter.convert_to_repr(file) if file else None
 
     def get_all(
             self, user_id: int, directory_id: int,
             offset: int = 0, limit: int = 100
-    ) -> Iterable[FileRepr]:
+    ) -> Iterable[FileDTO]:
         files = self._session.scalars(
             self._select_files(
                 user_id, directory_id
