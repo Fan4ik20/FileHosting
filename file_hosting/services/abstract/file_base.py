@@ -7,13 +7,13 @@ from .base import ServiceBase
 from database.repositories import (
     IUserRepository, IDirectoryRepository, IFileRepository
 )
-from database.repositories.representations import FileRepr
+from database.repositories.dto import FileDTO, FileCreateDTO
 
 
 __all__ = ['AFileService']
 
 
-class AFileService(ABC, ServiceBase[IFileRepository, FileRepr]):
+class AFileService(ABC, ServiceBase[IFileRepository]):
     def __init__(
             self, repository: IFileRepository,
             user_repository: IUserRepository,
@@ -25,20 +25,20 @@ class AFileService(ABC, ServiceBase[IFileRepository, FileRepr]):
         super().__init__(repository)
 
     @abstractmethod
-    def get(self, user_id: int, directory_id: int, file_id: UUID) -> FileRepr:
+    def get(self, user_id: int, directory_id: int, file_id: UUID) -> FileDTO:
         pass
 
     @abstractmethod
     def get_all(
             self, user_id: int, directory_id: int,
             offset: int = 0, limit: int = 100
-    ) -> Iterable[FileRepr]:
+    ) -> Iterable[FileDTO]:
         pass
 
     @abstractmethod
-    def create(self, user_id: int, file_repr: FileRepr) -> FileRepr:
+    def create(self, user_id: int, file_repr: FileCreateDTO) -> FileDTO:
         pass
 
     @abstractmethod
-    def delete(self, user_id: int, directory_id, file_id: UUID) -> None:
+    def delete(self, user_id: int, directory_id: int, file_id: UUID) -> None:
         pass

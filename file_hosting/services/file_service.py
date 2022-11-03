@@ -1,8 +1,8 @@
 from typing import Iterable
 from uuid import UUID
 
-from database.repositories.representations import (
-    DirectoryRepr, UserRepr, FileRepr
+from database.repositories.dto import (
+    DirectoryDTO, UserDTO, FileDTO, FileCreateDTO
 )
 
 from .abstract.file_base import AFileService
@@ -13,7 +13,7 @@ __all__ = ['FileService']
 
 
 class FileService(AFileService):
-    def _get_user_or_raise_exc(self, user_id: int) -> UserRepr:
+    def _get_user_or_raise_exc(self, user_id: int) -> UserDTO:
         user = self._user_repository.get_by_id(user_id)
 
         if user is None:
@@ -23,7 +23,7 @@ class FileService(AFileService):
 
     def _get_directory_or_raise_exc(
             self, user_id: int, directory_id: int
-    ) -> DirectoryRepr:
+    ) -> DirectoryDTO:
         directory = self._directory_repository.get_by_id(user_id, directory_id)
 
         if directory is None:
@@ -39,7 +39,7 @@ class FileService(AFileService):
 
     def _get_file_or_raise_exc(
             self, user_id: int, directory_id: int, file_id: UUID
-    ):
+    ) -> FileDTO:
         file = self._repository.get_by_id(
             user_id, directory_id, file_id
         )
@@ -51,7 +51,7 @@ class FileService(AFileService):
 
     def get(
             self, user_id: int, directory_id: int, file_id: UUID
-    ) -> FileRepr:
+    ) -> FileDTO:
         """Raises: UserNotFound, DirectoryNotFound, FileNotFound"""
 
         self._raise_exc_if_user_or_directory_is_none(user_id, directory_id)
@@ -63,14 +63,14 @@ class FileService(AFileService):
     def get_all(
             self, user_id: int, directory_id: int,
             offset: int = 0, limit: int = 100
-    ) -> Iterable[FileRepr]:
+    ) -> Iterable[FileDTO]:
         """Raises: UserNotFound, DirectoryNotFound"""
 
         self._raise_exc_if_user_or_directory_is_none(user_id, directory_id)
 
         return self._repository.get_all(user_id, directory_id, offset, limit)
 
-    def create(self, user_id: int, file_repr: FileRepr) -> FileRepr:
+    def create(self, user_id: int, file_repr: FileCreateDTO) -> FileDTO:
         """Raises: UserNotFound, DirectoryNotFound"""
 
         self._raise_exc_if_user_or_directory_is_none(

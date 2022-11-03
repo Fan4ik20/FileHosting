@@ -4,13 +4,14 @@ from typing import Iterable
 from .base import ServiceBase
 
 from database.repositories import IDirectoryRepository, IUserRepository
-from database.repositories.representations import DirectoryRepr
+from database.repositories.dto import \
+    DirectoryDTO, DirectoryUpdateDTO, DirectoryCreateDTO
 
 
 __all__ = ['ADirectoryService']
 
 
-class ADirectoryService(ABC, ServiceBase[IDirectoryRepository, DirectoryRepr]):
+class ADirectoryService(ABC, ServiceBase[IDirectoryRepository]):
     def __init__(
             self, repository: IDirectoryRepository,
             user_repository: IUserRepository
@@ -22,17 +23,17 @@ class ADirectoryService(ABC, ServiceBase[IDirectoryRepository, DirectoryRepr]):
     @abstractmethod
     def get(
             self, user_id: int, directory_id: int, related: bool = False
-    ) -> DirectoryRepr:
+    ) -> DirectoryDTO:
         pass
 
     @abstractmethod
     def get_all(
             self, user_id: int, offset: int = 0, limit: int = 100
-    ) -> Iterable[DirectoryRepr]:
+    ) -> Iterable[DirectoryDTO]:
         pass
 
     @abstractmethod
-    def create(self, directory_repr: DirectoryRepr) -> DirectoryRepr:
+    def create(self, directory_repr: DirectoryCreateDTO) -> DirectoryDTO:
         pass
 
     @abstractmethod
@@ -41,6 +42,7 @@ class ADirectoryService(ABC, ServiceBase[IDirectoryRepository, DirectoryRepr]):
 
     @abstractmethod
     def update(
-            self, user_id: int, directory_id: int, dir_repr: DirectoryRepr
-    ) -> DirectoryRepr:
+            self, user_id: int, directory_id: int,
+            dir_repr: DirectoryUpdateDTO
+    ) -> DirectoryDTO:
         pass
