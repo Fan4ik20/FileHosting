@@ -1,16 +1,18 @@
 from .base import BaseConverter
 
 from database.models import File as FileModel
-from database.repositories.representations import FileRepr
+from database.repositories.dto import FileDTO, FileUpdateDTO, FileCreateDTO
 
 
 __all__ = ['FileConverter']
 
 
-class FileConverter(BaseConverter):
+class FileConverter(
+    BaseConverter[FileModel, FileCreateDTO, FileDTO, FileUpdateDTO]
+):
     @staticmethod
-    def convert_to_repr(model: FileModel) -> FileRepr:
-        return FileRepr(
+    def convert_to_repr(model: FileModel) -> FileDTO:
+        return FileDTO(
             id=model.id,
             time_added=model.time_added,
             url=model.url,
@@ -20,10 +22,17 @@ class FileConverter(BaseConverter):
         )
 
     @staticmethod
-    def convert_to_model(repr_obj: FileRepr) -> FileModel:
+    def convert_to_model_create(repr_obj: FileCreateDTO) -> FileModel:
         return FileModel(
+            name=repr_obj.name,
             url=repr_obj.url,
-            directory_id=repr_obj.directory_id,
             type=repr_obj.type,
-            name=repr_obj.name
+            directory_id=repr_obj.directory_id
+        )
+
+    @staticmethod
+    def convert_to_model_update(repr_obj: FileUpdateDTO) -> FileModel:
+        return FileModel(
+            name=repr_obj.name,  # type: ignore
+            directory_id=repr_obj.directory_id  # type: ignore
         )

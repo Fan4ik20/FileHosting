@@ -1,21 +1,25 @@
 from .base import BaseConverter
 
-from database.repositories.representations import DirectoryRepr
+from database.repositories.dto import \
+    DirectoryDTO, DirectoryUpdateDTO, DirectoryCreateDTO
 
 from database.models import Directory as DirectoryModel
 
 from .file_converter import FileConverter
 
-
 __all__ = ['DirectoryConverter']
 
 
-class DirectoryConverter(BaseConverter):
+class DirectoryConverter(
+    BaseConverter[
+        DirectoryModel, DirectoryCreateDTO, DirectoryDTO, DirectoryUpdateDTO
+    ]
+):
     @classmethod
     def convert_to_repr(
             cls, model: DirectoryModel, related: bool = False
-    ) -> DirectoryRepr:
-        return DirectoryRepr(
+    ) -> DirectoryDTO:
+        return DirectoryDTO(
             id=model.id,
             name=model.name,
             user_id=model.user_id,
@@ -29,9 +33,27 @@ class DirectoryConverter(BaseConverter):
         )
 
     @staticmethod
-    def convert_to_model(repr_obj: DirectoryRepr) -> DirectoryModel:
+    def convert_to_model(repr_obj: DirectoryDTO) -> DirectoryModel:
         return DirectoryModel(
             name=repr_obj.name,
             user_id=repr_obj.user_id,
+            directory_id=repr_obj.directory_id
+        )
+
+    @staticmethod
+    def convert_to_model_create(
+            repr_obj: DirectoryCreateDTO) -> DirectoryModel:
+        return DirectoryModel(
+            name=repr_obj.name,
+            directory_id=repr_obj.directory_id,
+            user_id=repr_obj.user_id
+        )
+
+    @staticmethod
+    def convert_to_model_update(
+            repr_obj: DirectoryUpdateDTO
+    ) -> DirectoryModel:
+        return DirectoryModel(
+            name=repr_obj.name,  # type: ignore
             directory_id=repr_obj.directory_id
         )
