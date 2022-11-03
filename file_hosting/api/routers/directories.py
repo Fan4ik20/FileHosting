@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import Response
 
-from database.repositories.representations import (
-    DirectoryRepr, UserRepr, DirectoryReprUpdate
+from database.repositories.dto import (
+    UserDTO, DirectoryUpdateDTO, DirectoryCreateDTO
 )
 
 
@@ -22,10 +22,10 @@ from .schemas import directory as directory_sch
 router = APIRouter(prefix='/directories', tags=['Directories'])
 
 
-def _map_schema_to_repr(
+def _map_schema_to_repr_create(
         directory: directory_sch.DirectoryCreate, user_id: int
-) -> DirectoryRepr:
-    return DirectoryRepr(
+) -> DirectoryCreateDTO:
+    return DirectoryCreateDTO(
         name=directory.name,
         user_id=user_id,
         directory_id=directory.directory_id
@@ -34,13 +34,16 @@ def _map_schema_to_repr(
 
 def _map_schema_to_repr_update(
         directory: directory_sch.DirectoryPatch
-) -> DirectoryReprUpdate:
-    return DirectoryReprUpdate(**directory.dict(exclude_unset=True))
+) -> DirectoryUpdateDTO:
+    return DirectoryUpdateDTO(
+        name=directory.name,
+        directory_id=directory.directory_id
+    )
 
 
 @router.get('/', response_model=list[directory_sch.DirectoryGet])
 def get_directories(
-        active_user: UserRepr = Depends(ActiveUserS),
+        active_user: UserDTO = Depends(ActiveUserS),
         directory_service: IDirectoryService = Depends(DirectoryServiceS),
         pagination: PaginationParams = Depends()
 ):
@@ -58,10 +61,10 @@ def get_directories(
 )
 def create_directory(
         directory: directory_sch.DirectoryCreate,
-        active_user: UserRepr = Depends(ActiveUserS),
+        active_user: UserDTO = Depends(ActiveUserS),
         directory_service: IDirectoryService = Depends(DirectoryServiceS)
 ):
-    directory_repr = _map_schema_to_repr(directory, active_user.id)
+    directory_repr = _map_schema_to_repr_create(directory, active_user.id)
 
     try:
         return directory_service.create(
@@ -78,7 +81,7 @@ def create_directory(
 )
 def get_directory(
         directory_id: int,
-        active_user: UserRepr = Depends(ActiveUserS),
+        active_user: UserDTO = Depends(ActiveUserS),
         directory_service: IDirectoryService = Depends(DirectoryServiceS)
 ):
     try:
@@ -97,7 +100,7 @@ def get_directory(
 )
 def delete_directory(
         directory_id: int,
-        active_user: UserRepr = Depends(ActiveUserS),
+        active_user: UserDTO = Depends(ActiveUserS),
         directory_service: IDirectoryService = Depends(DirectoryServiceS)
 ):
     try:
@@ -112,7 +115,7 @@ def delete_directory(
 def patch_directory(
         directory_id: int,
         directory_patch: directory_sch.DirectoryPatch,
-        active_user: UserRepr = Depends(ActiveUserS),
+        active_user: UserDTO = Depends(ActiveUserS),
         directory_service: IDirectoryService = Depends(DirectoryServiceS)
 ):
     directory_repr = _map_schema_to_repr_update(directory_patch)

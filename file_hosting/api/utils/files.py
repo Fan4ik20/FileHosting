@@ -19,7 +19,9 @@ def _get_path_to_save(
     )
 
 
-def _get_path_to_file(path_to_save: path, file_id: UUID, file: UploadFile):
+def _get_path_to_file(
+        path_to_save: path, file_id: UUID, file: UploadFile
+) -> path:
     filetype = file.filename.split('.')[-1]
 
     return f'{path_to_save}/{file_id}.{filetype}'

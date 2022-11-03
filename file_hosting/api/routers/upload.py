@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, Depends, UploadFile
 
-from database.repositories.representations import UserRepr
+from database.repositories.dto import UserDTO
 
 from api.dependencies.stubs.auth import ActiveUserS
 
@@ -16,7 +16,7 @@ router = APIRouter(
 @router.post('/', status_code=status.HTTP_201_CREATED)
 def upload_file(
         directory_id: int, files: list[UploadFile],
-        active_user: UserRepr = Depends(ActiveUserS)
+        active_user: UserDTO = Depends(ActiveUserS)
 ):
     urls = []
 

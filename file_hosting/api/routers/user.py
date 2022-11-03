@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import Response
 
-from database.repositories.representations import UserRepr
+from database.repositories.dto import UserDTO
 
 from services import IUserService
 from services import service_exc
@@ -18,7 +18,7 @@ router = APIRouter(prefix='/users', tags=['Users'])
 
 
 @router.get('/me/', response_model=UserGet)
-def get_active_user(user: UserRepr = Depends(ActiveUserS)):
+def get_active_user(user: UserDTO = Depends(ActiveUserS)):
     return user
 
 
@@ -26,7 +26,7 @@ def get_active_user(user: UserRepr = Depends(ActiveUserS)):
     '/me/', response_class=Response, status_code=status.HTTP_204_NO_CONTENT
 )
 def delete_active_user(
-        user: UserRepr = Depends(ActiveUserS),
+        user: UserDTO = Depends(ActiveUserS),
         user_service: IUserService = Depends(UserServiceS)
 ):
     # FIXME.

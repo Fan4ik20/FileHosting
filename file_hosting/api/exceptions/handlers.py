@@ -6,14 +6,18 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 from . import base_exc
 
 
-def authjwt_exception_handler(_: Request, exc: AuthJWTException):
+def authjwt_exception_handler(
+        _: Request, exc: AuthJWTException
+) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": exc.message}
     )
 
 
-def object_not_exist_handler(_: Request, exc: base_exc.ObjectNotExist):
+def object_not_exist_handler(
+        _: Request, exc: base_exc.ObjectNotExist
+) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -23,7 +27,9 @@ def object_not_exist_handler(_: Request, exc: base_exc.ObjectNotExist):
     )
 
 
-def object_already_exist_handler(_: Request, exc: base_exc.ObjectAlreadyExist):
+def object_already_exist_handler(
+        _: Request, exc: base_exc.ObjectAlreadyExist
+) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -33,7 +39,9 @@ def object_already_exist_handler(_: Request, exc: base_exc.ObjectAlreadyExist):
     )
 
 
-def invalid_data_handler(_: Request, exc: base_exc.InvalidData):
+def invalid_data_handler(
+        _: Request, exc: base_exc.InvalidData
+) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
         content={

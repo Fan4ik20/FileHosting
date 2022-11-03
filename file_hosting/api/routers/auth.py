@@ -3,7 +3,7 @@ from fastapi_jwt_auth import AuthJWT
 
 from common.utils.passwords import verify_password
 
-from database.repositories.representations import UserRepr
+from database.repositories.dto import UserCreateDTO
 
 from services import UserService
 from services import service_exc
@@ -17,8 +17,10 @@ from .schemas import user_sch
 router = APIRouter(tags=['Authentication'])
 
 
-def _map_user_schema_to_repr(user_schema: user_sch.UserCreate) -> UserRepr:
-    return UserRepr(
+def _map_user_schema_to_repr(
+        user_schema: user_sch.UserCreate
+) -> UserCreateDTO:
+    return UserCreateDTO(
         username=user_schema.username, email=user_schema.email,
         password=user_schema.password
     )

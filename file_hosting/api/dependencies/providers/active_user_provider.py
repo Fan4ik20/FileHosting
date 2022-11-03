@@ -4,7 +4,7 @@ from fastapi_jwt_auth import AuthJWT
 from api.dependencies.stubs import UserServiceS
 
 from services import IUserService
-from database.repositories.representations import UserRepr
+from database.repositories.dto import UserDTO
 
 
 __all__ = ['ActiveUserProvider']
@@ -18,8 +18,8 @@ class ActiveUserProvider:
     def __call__(
             self, auth: AuthJWT = Depends(),
             user_service: IUserService = Depends(UserServiceS),
-            _=Depends(login_required)
-    ) -> UserRepr:
+            _: None = Depends(login_required)
+    ) -> UserDTO:
         user_id = auth.get_jwt_subject()
 
         return user_service.get(user_id)

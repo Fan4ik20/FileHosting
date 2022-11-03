@@ -52,7 +52,7 @@ def _include_services(app: FastAPI) -> None:
 
 def _include_database(
         app: FastAPI, config: DatabaseSettings, base: Type[DeclarativeMeta]
-):
+) -> None:
     engine = db_utils.create_engine(config)
     session_maker = db_utils.create_session_maker(engine)
 
@@ -101,7 +101,7 @@ def create_app() -> FastAPI:
 
 
 @AuthJWT.load_config
-def get_config():
+def get_config() -> JWTSettings:
     return JWTSettings(_env_file='.env')
 
 
