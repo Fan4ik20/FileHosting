@@ -1,41 +1,48 @@
-from uuid import uuid4
+from datetime import datetime
+from uuid import uuid4, UUID as TUUID
+from typing import Iterable, Type
 
 from sqlalchemy import (
     Column, Integer, String, ForeignKey, DateTime, func, UniqueConstraint
 )
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import declarative_base, relationship, backref
+from sqlalchemy.dialects.postgresql import UUID as UUID_C
+from sqlalchemy.orm import \
+    declarative_base, relationship, backref, Mapped, DeclarativeMeta
 
-HostingBase = declarative_base()
+HostingBase: Type[DeclarativeMeta] = declarative_base()
 
 
 class User(HostingBase):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True)
+    id: Mapped[int] = Column(Integer, primary_key=True)
 
-    username = Column(String(100), unique=True, nullable=False)
-    email = Column(String(150), unique=True, nullable=False)
-    password = Column(String, nullable=False)
+    username: Mapped[str] = Column(String(100), unique=True, nullable=False)
+    email: Mapped[str] = Column(String(150), unique=True, nullable=False)
+    password: Mapped[str] = Column(String, nullable=False)
 
 
 class Directory(HostingBase):
     __tablename__ = 'directories'
 
-    id = Column(Integer, primary_key=True)
+    id: Mapped[int] = Column(Integer, primary_key=True)
 
-    name = Column(String(100), nullable=False)
+    name: Mapped[str] = Column(String(100), nullable=False)
 
-    user_id = Column(
+    user_id: Mapped[int] = Column(
         Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False
     )
-    user = relationship('User', backref='directories')
+    user: Mapped['User'] = relationship('User', backref='directories')
 
-    directory_id = Column(
+    directory_id: Mapped[int | None] = Column(
         Integer, ForeignKey('directories.id', ondelete='CASCADE')
     )
-    inner_dirs = relationship(
+
+    inner_dirs: Mapped[Iterable['Directory']] = relationship(
         'Directory', backref=backref('external_dir', remote_side=[id])
+    )
+    files: Mapped[Iterable['File']] = relationship(
+        'File', back_populates='directories'
     )
 
     __table_args__ = (UniqueConstraint('name', 'user_id', 'directory_id'),)
@@ -44,15 +51,17 @@ class Directory(HostingBase):
 class File(HostingBase):
     __tablename__ = 'files'
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: TUUID = Column(UUID_C(as_uuid=True), primary_key=True, default=uuid4)
 
-    url = Column(String, nullable=False)
-    name = Column(String, nullable=False)
-    type = Column(String, nullable=False)
-    time_added = Column(DateTime, server_default=func.now())
+    url: Mapped[str] = Column(String, nullable=False)
+    name: Mapped[str] = Column(String, nullable=False)
+    type: Mapped[str] = Column(String, nullable=False)
+    time_added: Mapped[datetime] = Column(DateTime, server_default=func.now())
 
-    directory_id = Column(
+    directory_id: Mapped[int] = Column(
         Integer, ForeignKey('directories.id', ondelete='CASCADE'),
         nullable=False
     )
-    user = relationship('Directory', backref='files')
+    directory: Mapped['Directory'] = relationship(
+        'Directory', back_populates='files'
+    )
