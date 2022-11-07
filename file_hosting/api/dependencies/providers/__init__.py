@@ -1,4 +1,4 @@
-from .service_provideres import \
+from .service_providers import \
     UserServiceProvider, DirectoryServiceProvider, FileServiceProvider
 from .db_provider import DatabaseProvider
 from .active_user_provider import ActiveUserProvider
