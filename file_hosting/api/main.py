@@ -1,13 +1,10 @@
 import os
-from typing import Type
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi_jwt_auth import AuthJWT
-
-from sqlalchemy.orm import DeclarativeMeta
 
 from config import DatabaseSettings, JWTSettings
 
@@ -51,7 +48,7 @@ def _include_services(app: FastAPI) -> None:
 
 
 def _include_database(
-        app: FastAPI, config: DatabaseSettings, base: Type[DeclarativeMeta]
+        app: FastAPI, config: DatabaseSettings
 ) -> None:
     engine = db_utils.create_engine(config)
     session_maker = db_utils.create_session_maker(engine)
@@ -59,7 +56,7 @@ def _include_database(
     app.dependency_overrides[stubs.SessionS] = \
         providers.DatabaseProvider(session_maker)
 
-    db_utils.create_tables(base, engine)
+    db_utils.create_tables(engine)
 
 
 def _include_auth(app: FastAPI) -> None:
@@ -89,7 +86,7 @@ def create_app() -> FastAPI:
 
     origins = ['*']
 
-    _include_database(app, db_config, HostingBase)
+    _include_database(app, db_config)
     _include_services(app)
     _include_routers(app)
     _include_handlers(app)
