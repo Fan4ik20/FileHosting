@@ -5,7 +5,7 @@ from sqlalchemy import delete, select
 from database.models import User as UserModel
 
 from .abstract.user_base import AUserRepository
-from .dto import UserDTO
+from .dto import UserDTO, UserCreateDTO
 from .converters import UserConverter
 from .typing_ import DbSession
 
@@ -18,7 +18,9 @@ class UserRepository(AUserRepository):
             self, session: DbSession, model: Type[UserModel] = UserModel,
             converter: Type[UserConverter] = UserConverter
     ):
-        super().__init__(session, model, converter)
+        self._converter = converter
+
+        super().__init__(session, model)
 
     def get_by_id(self, id_: int) -> UserDTO | None:
         user = self._session.get(self._model, id_)
@@ -50,3 +52,13 @@ class UserRepository(AUserRepository):
         self._session.execute(delete(self._model).filter_by(id=id_))
 
         self._session.commit()
+
+    def create(self, user_repr: UserCreateDTO) -> UserDTO:
+        new_object = self._converter.convert_to_model_create(user_repr)
+
+        self._session.add(new_object)
+        self._session.commit()
+
+        self._session.refresh(new_object)
+
+        return self._converter.convert_to_repr(new_object)

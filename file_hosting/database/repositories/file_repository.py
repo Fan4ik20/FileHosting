@@ -7,7 +7,7 @@ from sqlalchemy.sql import Select
 from database.models import File as FileModel, Directory as DirectoryModel
 
 from .abstract.file_base import AFileRepository
-from .dto import FileDTO
+from .dto import FileDTO, FileCreateDTO
 from .converters import FileConverter
 from .typing_ import DbSession
 
@@ -22,8 +22,9 @@ class FileRepository(AFileRepository):
             converter: Type[FileConverter] = FileConverter
     ) -> None:
         self._directory_model = directory_model
+        self._converter = converter
 
-        super().__init__(session, model, converter)
+        super().__init__(session, model)
 
     def _select_files(self, user_id: int, directory_id: int) -> Select:
         return select(self._model).join(
@@ -59,3 +60,13 @@ class FileRepository(AFileRepository):
     def delete(self, id_: UUID) -> None:
         self._session.execute(delete(self._model).filter_by(id=id_))
         self._session.commit()
+
+    def create(self, file_repr: FileCreateDTO) -> FileDTO:
+        new_object = self._converter.convert_to_model_create(file_repr)
+
+        self._session.add(new_object)
+        self._session.commit()
+
+        self._session.refresh(new_object)
+
+        return self._converter.convert_to_repr(new_object)

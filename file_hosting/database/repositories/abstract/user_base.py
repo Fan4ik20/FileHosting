@@ -5,17 +5,14 @@ from .base import BaseRepository
 
 from database.models import User as UserModel
 
-from database.repositories.dto import UserDTO, UserCreateDTO, UserUpdateDTO
-from ..converters import UserConverter
+from database.repositories.dto import UserDTO, UserCreateDTO
 
 
 __all__ = ['AUserRepository']
 
 
 class AUserRepository(
-    ABC, BaseRepository[
-        UserModel, UserCreateDTO, UserDTO, UserUpdateDTO, UserConverter
-    ]
+    ABC, BaseRepository[UserModel, UserCreateDTO, UserDTO]
 ):
     @abstractmethod
     def get_by_id(self, id_: int) -> UserDTO | None:
@@ -35,4 +32,8 @@ class AUserRepository(
 
     @abstractmethod
     def delete(self, id_: int) -> None:
+        pass
+
+    @abstractmethod
+    def create(self, user_repr: UserCreateDTO) -> UserDTO:
         pass

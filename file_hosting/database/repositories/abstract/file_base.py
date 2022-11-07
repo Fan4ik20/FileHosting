@@ -3,19 +3,16 @@ from typing import Iterable
 from uuid import UUID
 
 from database.models import File as FileModel
-from database.repositories.dto import FileDTO, FileCreateDTO, FileUpdateDTO
+from database.repositories.dto import FileDTO, FileCreateDTO
 
 from .base import BaseRepository
-from ..converters import FileConverter
 
 
 __all__ = ['AFileRepository']
 
 
 class AFileRepository(
-    ABC, BaseRepository[
-        FileModel, FileCreateDTO, FileDTO, FileUpdateDTO, FileConverter
-    ]
+    ABC, BaseRepository[FileModel, FileCreateDTO, FileDTO]
 ):
     @abstractmethod
     def get_by_id(
@@ -32,4 +29,8 @@ class AFileRepository(
 
     @abstractmethod
     def delete(self, id_: UUID) -> None:
+        pass
+
+    @abstractmethod
+    def create(self, file_repr: FileCreateDTO) -> FileDTO:
         pass

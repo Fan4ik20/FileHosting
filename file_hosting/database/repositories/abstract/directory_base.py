@@ -5,8 +5,6 @@ from database.models import Directory as DirectoryModel
 from database.repositories.dto import \
     DirectoryDTO, DirectoryCreateDTO, DirectoryUpdateDTO
 
-from ..converters import DirectoryConverter
-
 from .base import BaseRepository
 
 
@@ -14,9 +12,7 @@ __all__ = ['ADirectoryRepository']
 
 
 class ADirectoryRepository(
-    ABC, BaseRepository[
-        DirectoryModel, DirectoryCreateDTO, DirectoryDTO, DirectoryUpdateDTO, DirectoryConverter
-    ]
+    ABC, BaseRepository[DirectoryModel, DirectoryCreateDTO, DirectoryDTO]
 ):
     @abstractmethod
     def get_by_id(
@@ -56,4 +52,8 @@ class ADirectoryRepository(
     def update(
             self, user_id: int, id_: int, dir_repr: DirectoryUpdateDTO
     ) -> DirectoryDTO | None:
+        pass
+
+    @abstractmethod
+    def create(self, directory_repr: DirectoryCreateDTO) -> DirectoryDTO:
         pass

@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 from database.models import Directory
 
 from .abstract.directory_base import ADirectoryRepository
-from .dto import DirectoryDTO, DirectoryUpdateDTO
+from .dto import DirectoryDTO, DirectoryUpdateDTO, DirectoryCreateDTO
 from .converters import DirectoryConverter
 from .typing_ import DbSession
 
@@ -21,7 +21,9 @@ class DirectoryRepository(ADirectoryRepository):
             model: Type[Directory] = Directory,
             converter: Type[DirectoryConverter] = DirectoryConverter
     ) -> None:
-        super().__init__(session, model, converter)
+        self._converter = converter
+
+        super().__init__(session, model)
 
     @staticmethod
     def _update_model(
@@ -119,3 +121,13 @@ class DirectoryRepository(ADirectoryRepository):
         self._session.refresh(directory)
 
         return self._converter.convert_to_repr(directory)
+
+    def create(self, directory_repr: DirectoryCreateDTO) -> DirectoryDTO:
+        new_object = self._converter.convert_to_model_create(directory_repr)
+
+        self._session.add(new_object)
+        self._session.commit()
+
+        self._session.refresh(new_object)
+
+        return self._converter.convert_to_repr(new_object)
